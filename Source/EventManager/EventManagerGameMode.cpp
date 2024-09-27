@@ -1,7 +1,6 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// // Copyright Pablo Rodrigo Sanchez, Inc. All Rights Reserved.
 
 #include "EventManagerGameMode.h"
-#include "EventManagerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AEventManagerGameMode::AEventManagerGameMode()

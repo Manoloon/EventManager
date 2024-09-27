@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// // Copyright Pablo Rodrigo Sanchez, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -14,6 +14,3 @@ class AEventManagerGameMode : public AGameModeBase
 public:
 	AEventManagerGameMode();
 };
-
-
-

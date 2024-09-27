@@ -1,10 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// // Copyright Pablo Rodrigo Sanchez, Inc. All Rights Reserved.
 
 #include "..\Public\EventListenerActor.h"
-
-#include "EventManagerActor.h"
-#include "Kismet/GameplayStatics.h"
+#include "EventManager/EventManagerSubsystem.h"
 
 AEventListenerActor::AEventListenerActor()
 {
@@ -16,16 +13,16 @@ void AEventListenerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	DefaultEventData = EventData;
-	AEventManagerActor* EventManager = GetEventManager();
-	if(EventManager != nullptr)
+	//AEventManagerActor* EventManager = GetEventManager();
+	if (UEventManagerSubsystem* EventManager = GetWorld()->GetSubsystem<UEventManagerSubsystem>())
 	{
-		EventManager->OnEventCalledDelegate.AddUObject(this,&ThisClass::OnEventReceived);
+		EventManager->OnEventCalledDelegate.AddUObject(this, &ThisClass::OnEventReceived);
 	}
 }
 
 void AEventListenerActor::OnEventReceived(FName Event)
 {
-	UE_LOG(LogTemp,Warning,TEXT("EVent REceived %s"),*Event.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("EVent REceived %s"), *Event.ToString());
 	if (EventData.ActivationByEvent && EventData.ActivationEvent == Event)
 	{
 		ActivateByEvent();
@@ -34,7 +31,7 @@ void AEventListenerActor::OnEventReceived(FName Event)
 	{
 		DeactivateByEvent();
 	}
-	if (Event == *EventManagerConst::ResetEventPrefix)
+	if (Event == *EventManagerLabels::ResetEventPrefix)
 	{
 		ResetEventCalled();
 	}
@@ -42,27 +39,20 @@ void AEventListenerActor::OnEventReceived(FName Event)
 }
 
 void AEventListenerActor::CallEvent(FName Event)
-{	
+{
 	if (Event == NAME_None)
 		return;
-	AEventManagerActor* EventManager = GetEventManager();
-	if (EventManager != nullptr)
+	
+	if (UEventManagerSubsystem* EventManager = GetWorld()->GetSubsystem<UEventManagerSubsystem>())
 	{
 		EventManager->CallEvent(Event);
-	}
-	else
-	{
-		EventManager = GetEventManager();
-		if(EventManager != nullptr)
-		{
-			EventManager->CallEvent(Event);
-		}
 	}
 }
 
 void AEventListenerActor::ActivateByEvent()
 {
-	if (Activated) return;
+	if (Activated)
+		return;
 
 	Activated = true;
 	K2_OnActivateByEvent();
@@ -80,16 +70,11 @@ void AEventListenerActor::DeactivateByEvent()
 
 void AEventListenerActor::ResetEventCalled()
 {
-	if (DeniedReset || DefaultEventData.ActivationByEvent) return;
+	if (DeniedReset || DefaultEventData.ActivationByEvent)
+		return;
 
 	EventData = DefaultEventData;
 	Activated = Activated && DeniedReset;
 	K2_OnResetEventCalled();
 	DeactivateByEvent();
-}
-
-AEventManagerActor* AEventListenerActor::GetEventManager() const
-{
-	AActor* Actor = UGameplayStatics::GetActorOfClass(this, AEventManagerActor::StaticClass());
-	return Cast<AEventManagerActor>(Actor);
 }
