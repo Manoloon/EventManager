@@ -13,7 +13,7 @@ void AEventListenerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	DefaultEventData = EventData;
-	//AEventManagerActor* EventManager = GetEventManager();
+	Activated = !EventData.ActivationByEvent;
 	if (UEventManagerSubsystem* EventManager = GetWorld()->GetSubsystem<UEventManagerSubsystem>())
 	{
 		EventManager->OnEventCalledDelegate.AddUObject(this, &ThisClass::OnEventReceived);

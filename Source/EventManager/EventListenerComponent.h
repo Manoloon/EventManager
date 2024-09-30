@@ -1,12 +1,13 @@
-// // Copyright Pablo Rodrigo Sanchez, Inc. All Rights Reserved.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EventListenerActor.generated.h"
+#include "Components/ActorComponent.h"
+#include "EventListenerComponent.generated.h"
 
 USTRUCT(BlueprintType)
-struct FEventListenerData
+struct FEventListenerComData
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InlineEditConditionToggle))
@@ -20,26 +21,22 @@ struct FEventListenerData
 	FName DeactivationEvent = NAME_None;
 };
 
-UCLASS(Abstract, ClassGroup = EventListener, meta = (DisableNativeTick))
-class EVENTMANAGER_API AEventListenerActor : public AActor
+UCLASS(Abstract,Blueprintable,ClassGroup=(Custom), meta=(BlueprintSpawnableComponent,DisableNativeTick))
+class EVENTMANAGER_API UEventListenerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
-	AEventListenerActor();
-	UFUNCTION(BlueprintCallable)
-	void CallEvent(FName Event);
-	UFUNCTION(BlueprintCallable)
-	bool IsActive() const {return Activated;}
+	// Sets default values for this component's properties
+	UEventListenerComponent();
+
 protected:
-	// Called when the game starts or when spawned
+	// Called when the game starts
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, Category = Settings)
-	FEventListenerData EventData;
-	FEventListenerData DefaultEventData;
+	FEventListenerComData EventData;
+	FEventListenerComData DefaultEventData;
 	bool Activated = false;
-
 	UPROPERTY(EditAnywhere, Category = Settings)
 	bool DeniedReset = false;
 
@@ -61,4 +58,11 @@ protected:
 	void ResetEventCalled();
 	UFUNCTION(BlueprintImplementableEvent, meta =( DisplayName = "OnResetEventCalled", ScriptName = "OnResetEventCalled"))
 	void K2_OnResetEventCalled();
+	
+public:
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void CallEvent(FName Event);
+
 };
